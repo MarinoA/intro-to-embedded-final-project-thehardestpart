@@ -2,11 +2,15 @@
 #include "Font.h"
 #include <string.h>
 #include "images.h"
-//#include "images2.h"
+#include <msp430.h>
+#include "somethingelse.c"
+
+extern void somethingelse(void);
 
 #define OLED_Write_Address 0x3C
 
-int i = 0; 
+int i = 0;
+//const unsigned char * rx;
 
 void OLED_Data(char *DATA) /* Function for sending data to OLED */
 {
@@ -122,19 +126,8 @@ void setup() {
   OLED_Data("Ass");
   OLED_setXY(0x00, 0x7F, 0x00, 0x08);
   delay(2000); 
-  P1DIR |= BIT0;                            // Set P1.0 to output direction
-  P1IE |=  BIT3;                            // P1.3 interrupt enabled
-  P1IES |= BIT3;                            // P1.3 falling edge
-  P1REN |= BIT3;                            // Enable Pull Up on SW2 (P1.3)
-  P1IFG &= ~BIT3;                           // P1.3 IFG cleared
+  somethingelse();
 }
-
-/*void loop() {      
-  OLED_image(Smiley_5);
-  delay(200);
-  OLED_image(Smiley_6);
-  delay(200);
-}*/
 
 void loop()
 {
@@ -149,7 +142,6 @@ void loop()
 __interrupt void Port_1(void)
 { 
   const unsigned char * image[7] = {Eggplant, Rock, XD, MiddleFinger, Smiley_4, Smiley_3, Smiley_2};
-  P1OUT ^= BIT0;                            // P1.0 = toggle
   OLED_image(image[i]);
   P1IFG &= ~BIT3;                           // P1.3 IFG cleared
   delay(200);
@@ -162,3 +154,12 @@ __interrupt void Port_1(void)
     i = 0;
   }
 }
+
+
+/*#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
+{
+  rx = (const unsigned char *) UCA0RXBUF;
+  P1OUT ^= BIT0;
+  OLED_image(rx);
+}*/
