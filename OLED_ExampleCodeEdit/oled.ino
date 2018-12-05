@@ -2,8 +2,11 @@
 #include "Font.h"
 #include <string.h>
 #include "images.h"
+//#include "images2.h"
 
 #define OLED_Write_Address 0x3C
+
+int i = 0; 
 
 void OLED_Data(char *DATA) /* Function for sending data to OLED */
 {
@@ -112,9 +115,11 @@ void setup() {
   //OLED_clear();
   //delay(200);
   OLED_setXY(0x31, 0x7F, 0x03, 0x02);
-  OLED_Data("Fuck");
+  OLED_Data("Eat");
   OLED_setXY(0x36, 0x7F, 0x04, 0x03);
-  OLED_Data("Off");
+  OLED_Data("My");
+  OLED_setXY(0x31, 0x7F, 0x05, 0x04);
+  OLED_Data("Ass");
   OLED_setXY(0x00, 0x7F, 0x00, 0x08);
   delay(2000); 
   P1DIR |= BIT0;                            // Set P1.0 to output direction
@@ -122,8 +127,6 @@ void setup() {
   P1IES |= BIT3;                            // P1.3 falling edge
   P1REN |= BIT3;                            // Enable Pull Up on SW2 (P1.3)
   P1IFG &= ~BIT3;                           // P1.3 IFG cleared
-
-  
 }
 
 /*void loop() {      
@@ -135,17 +138,27 @@ void setup() {
 
 void loop()
 {
-  
+  /*OLED_image(Frame1);
+  OLED_image(Frame2);
+  OLED_image(Frame3);
+  OLED_image(Frame4);*/
 }
 
 
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1(void)
 { 
-//  int i = 1; 
+  const unsigned char * image[7] = {Eggplant, Rock, Smiley_6, Smiley_5, Smiley_4, Smiley_3, Smiley_2};
   P1OUT ^= BIT0;                            // P1.0 = toggle
-  OLED_image(Smiley_7);
+  OLED_image(image[i]);
   P1IFG &= ~BIT3;                           // P1.3 IFG cleared
   delay(200);
-//  i++;
+  if(i < 6)
+  {
+      i++;
+  }
+  else
+  {
+    i = 0;
+  }
 }
