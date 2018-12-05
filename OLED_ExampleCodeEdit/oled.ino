@@ -148,7 +148,7 @@ void loop()
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1(void)
 { 
-  const unsigned char * image[7] = {Eggplant, Rock, Smiley_6, Smiley_5, Smiley_4, Smiley_3, Smiley_2};
+  const unsigned char * image[7] = {Eggplant, Rock, XD, MiddleFinger, Smiley_4, Smiley_3, Smiley_2};
   P1OUT ^= BIT0;                            // P1.0 = toggle
   OLED_image(image[i]);
   P1IFG &= ~BIT3;                           // P1.3 IFG cleared
