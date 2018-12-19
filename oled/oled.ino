@@ -114,17 +114,13 @@ void setup() {
   delay(100);  
   OLED_clear(); /* Clear OLED */
   delay(1000);
-  //OLED_image(Launchpad_Logo);
-  //delay(2000);
-  //OLED_clear();
-  //delay(200);
   OLED_setXY(0x31, 0x7F, 0x03, 0x02);
   OLED_Data("Emoji");
   OLED_setXY(0x36, 0x7F, 0x04, 0x03);
   OLED_Data("Sender");
   OLED_setXY(0x31, 0x7F, 0x05, 0x04);
   OLED_Data("3000");
-  OLED_setXY(0x00, 0x7F, 0x00, 0x08);
+  OLED_setXY(0x00, 0x7F, 0x00, 0x08); //Main text that appears when the board is powered
   delay(2000);
 
   P1DIR |= BIT0;                            // Set P1.0 to output direction
@@ -147,7 +143,7 @@ void setup() {
 
 void loop()
 {
-  switch(Serial.read())
+  switch(Serial.read())   //Switch case checks the uart receive and draws the corresponding image to the value received
   {
     case 1:  
       delay(1000);
@@ -181,7 +177,7 @@ void loop()
       delay(1000);
       OLED_image(Smile);
       break;
-    case 9:  
+    case 9:                   //Receives a 9 if the other user isnt present and prints this message
       delay(1000);
       OLED_setXY(0x31, 0x7F, 0x03, 0x02);
       OLED_Data("Receiver");
@@ -199,14 +195,14 @@ void loop()
 
 
 #pragma vector=PORT1_VECTOR
-__interrupt void Port_1(void)
+__interrupt void Port_1(void)     //left button interrupt - runs through catalog of images
 { 
 
-  const unsigned char * image[8] = {Eggplant, XD, MiddleFinger, B, Fire, Heart, Cry, Smile};
-  OLED_image(image[i]);
+  const unsigned char * image[8] = {Eggplant, XD, MiddleFinger, B, Fire, Heart, Cry, Smile};    //creates arraylist of images
+  OLED_image(image[i]);                     //board writes image of a specific location in the arraylist to the screen
   P1IFG &= ~BIT3;                           // P1.3 IFG cleared
   delay(200);
-  if(i < 7)
+  if(i < 7)                                 //the integer iterates through the list of images
   {
       i++;
   }
@@ -217,19 +213,19 @@ __interrupt void Port_1(void)
 }
 
 #pragma vector=PORT2_VECTOR
-__interrupt void Port_2(void)
+__interrupt void Port_2(void)       //right button interrupt - sends signal to the 5529
 { 
-  P1OUT ^= BIT0;
+  //P1OUT ^= BIT0;                    
 
-  Serial.write(i);
+  Serial.write(i);                  // Sends through the TX pin the value of 'i'
    
-  i = 0;
+  i = 0;                            //sets i back to zero so the array starts from the beginning
   
   OLED_clear();
   OLED_setXY(0x31, 0x7F, 0x03, 0x02);
   OLED_Data("Message");
   OLED_setXY(0x36, 0x7F, 0x04, 0x03);
-  OLED_Data("Sent");
+  OLED_Data("Sent");                    //displays a message that the message was sent to the 5529
   
   P2IFG &= ~BIT0;                           // P2.0 IFG cleared
   delay(200);
@@ -241,7 +237,7 @@ __interrupt void Port_2(void)
   OLED_Data("Sender");
   OLED_setXY(0x31, 0x7F, 0x05, 0x04);
   OLED_Data("3000");
-  OLED_setXY(0x00, 0x7F, 0x00, 0x08);
+  OLED_setXY(0x00, 0x7F, 0x00, 0x08);     //default home screen message is printed
 
 }
 
