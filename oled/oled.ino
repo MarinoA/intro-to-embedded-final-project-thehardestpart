@@ -3,14 +3,13 @@
 #include <string.h>
 #include "images.h"
 #include <msp430.h>
-#include "somethingelse.c"
+//#include "somethingelse.c"
 
-extern void somethingelse(void);
+//extern void somethingelse(void);
 
 #define OLED_Write_Address 0x3C
 
 int i = 0;
-//const unsigned char * rx;
 
 void OLED_Data(char *DATA) /* Function for sending data to OLED */
 {
@@ -108,6 +107,7 @@ void OLED_image(const unsigned char *image_data)   /* Function for sending image
 }
 
 
+
 void setup() {
   Wire.begin(); /* Initiate wire library and join I2C bus as a master */
   OLED_init(); /* Initialize OLED */
@@ -119,33 +119,94 @@ void setup() {
   //OLED_clear();
   //delay(200);
   OLED_setXY(0x31, 0x7F, 0x03, 0x02);
-  OLED_Data("Eat");
+  OLED_Data("Emoji");
   OLED_setXY(0x36, 0x7F, 0x04, 0x03);
-  OLED_Data("My");
+  OLED_Data("Sender");
   OLED_setXY(0x31, 0x7F, 0x05, 0x04);
-  OLED_Data("Ass");
+  OLED_Data("3000");
   OLED_setXY(0x00, 0x7F, 0x00, 0x08);
-  delay(2000); 
-  somethingelse();
+  delay(2000);
+
+  P1DIR |= BIT0;                            // Set P1.0 to output direction
+  P1SEL |= 0;
+  
+  P1DIR &= ~(BIT3);
+  P1IE |=  BIT3;                            // P1.3 interrupt enabled
+  P1IES |= BIT3;                            // P1.3 falling edge
+  P1REN |= BIT3;                            // Enable Pull Up on SW2 (P1.3)
+  P1IFG &= ~(BIT3);                           // P1.3 IFG cleared
+
+  P2DIR &= ~(BIT0);
+  P2IE |=  BIT0;                            // P2.0 interrupt enabled
+  P2IES |= BIT0;                            // P2.0 falling edge
+  P2REN |= BIT0;                            // Enable Pull Up on SW2 (P2.0)
+  P2IFG &= ~(BIT0);                           // P2.0 IFG cleared
+  
+  Serial.begin(9600);
 }
 
 void loop()
 {
-  /*OLED_image(Frame1);
-  OLED_image(Frame2);
-  OLED_image(Frame3);
-  OLED_image(Frame4);*/
+  switch(Serial.read())
+  {
+    case 1:  
+      delay(1000);
+      OLED_image(Eggplant);
+      break;
+    case 2: 
+      delay(1000);
+      OLED_image(XD);
+      break;
+    case 3:  
+      delay(1000);
+      OLED_image(MiddleFinger);
+      break;
+    case 4:  
+      delay(1000);
+      OLED_image(B);
+      break;
+    case 5: 
+      delay(1000);
+      OLED_image(Fire);
+      break;
+    case 6: 
+      delay(1000);
+      OLED_image(Heart);
+      break;
+    case 7:  
+      delay(1000);
+      OLED_image(Cry);
+      break;
+    case 8: 
+      delay(1000);
+      OLED_image(Smile);
+      break;
+    case 9:  
+      delay(1000);
+      OLED_setXY(0x31, 0x7F, 0x03, 0x02);
+      OLED_Data("Receiver");
+      OLED_setXY(0x36, 0x7F, 0x04, 0x03);
+      OLED_Data("Not");
+      OLED_setXY(0x31, 0x7F, 0x05, 0x04);
+      OLED_Data("Found");
+      delay(1000);
+      OLED_clear();
+      break;
+    default:
+      break;
+  }
 }
 
 
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1(void)
 { 
-  const unsigned char * image[7] = {Eggplant, Rock, XD, MiddleFinger, Smiley_4, Smiley_3, Smiley_2};
+
+  const unsigned char * image[8] = {Eggplant, XD, MiddleFinger, B, Fire, Heart, Cry, Smile};
   OLED_image(image[i]);
   P1IFG &= ~BIT3;                           // P1.3 IFG cleared
   delay(200);
-  if(i < 6)
+  if(i < 7)
   {
       i++;
   }
@@ -153,6 +214,35 @@ __interrupt void Port_1(void)
   {
     i = 0;
   }
+}
+
+#pragma vector=PORT2_VECTOR
+__interrupt void Port_2(void)
+{ 
+  P1OUT ^= BIT0;
+
+  Serial.write(i);
+   
+  i = 0;
+  
+  OLED_clear();
+  OLED_setXY(0x31, 0x7F, 0x03, 0x02);
+  OLED_Data("Message");
+  OLED_setXY(0x36, 0x7F, 0x04, 0x03);
+  OLED_Data("Sent");
+  
+  P2IFG &= ~BIT0;                           // P2.0 IFG cleared
+  delay(200);
+  
+  OLED_clear();
+  OLED_setXY(0x31, 0x7F, 0x03, 0x02);
+  OLED_Data("Emoji");
+  OLED_setXY(0x36, 0x7F, 0x04, 0x03);
+  OLED_Data("Sender");
+  OLED_setXY(0x31, 0x7F, 0x05, 0x04);
+  OLED_Data("3000");
+  OLED_setXY(0x00, 0x7F, 0x00, 0x08);
+
 }
 
 
